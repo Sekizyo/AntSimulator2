@@ -70,18 +70,20 @@ class Moves(Position):
         if list:
             return sum(list) / len(list)    
 
-class Diffusion(Moves):
+class TrailExpiration(Moves):
     def update(self, blocks: list[int]) -> None:
         for y, col in enumerate(blocks):
             for x, block in enumerate(col):
-                if block > 0:
-                    self.updateBlocks(x, y)
+                self.expirate(x, y, block)
 
-    def updateBlocks(self, x: int, y: int) -> None:
-        pass
-        # neighboursPos = self.getMoves(x, y)
-        # for x, y in neighboursPos:
-        #     self.updateBlock(x, y, -3)
+    def expirate(self, x: int, y: int, value: int) -> None:
+        if 0 < value <= 100:
+            self.updateBlock(x, y, -1)
+        elif 0 > value >= -100:
+            self.updateBlock(x, y, 1)
+
+class Trail(TrailExpiration):
+    pass
 
 class Controls():
     def createBlocks(self) -> None:
@@ -102,8 +104,8 @@ class Controls():
 
     def addFood(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
-        self.foodCounter += 1 
-        self.updateBlock(x, y, 1)
+        self.foodCounter += 10
+        self.updateBlock(x, y, 10)
 
     def reset(self) -> None:
         self.blocks = []
@@ -113,7 +115,7 @@ class Controls():
 
         self.createBlocks()
 
-class Grid(Render, Diffusion, Controls):
+class Grid(Render, Trail, Controls):
     def __init__(self, surface: pygame.surface.Surface) -> None:
         self.surface = surface
         self.size = BLOCKSIZE
