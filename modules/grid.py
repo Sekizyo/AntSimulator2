@@ -9,21 +9,17 @@ class Render():
                 ants = blocks[y][x]
                 self.renderBlock(ants, rect)
 
-    def renderBlock(self, ants: int, rect: list[pygame.Rect]) -> None:
-        if ants >= 0:
-            color = self.getColor(ants)
-            pygame.draw.rect(self.surface, color, rect)
-        elif ants == -1:
-            pygame.draw.rect(self.surface, [255, 0, 0], rect)
-        elif ants == -2:
-            pygame.draw.rect(self.surface, [0, 255, 0], rect)
-
-    def getColor(self, ants: int) -> list[int]:
-        delta = ants
-        if delta > 255: 
-            return [255, 255, 255]
-        else:
-            return [delta, delta, delta]
+    def renderBlock(self, value: int, rect: list[pygame.Rect]) -> None:
+        if value == 0:
+            pygame.draw.rect(self.surface, (0, 0, 0), rect)
+        elif 0 < value <= 255:
+            pygame.draw.rect(self.surface, (0, value, 0), rect)
+        elif value > 255:
+            pygame.draw.rect(self.surface, (0, 255, 0), rect)
+        elif 0 > value >= -100:
+            pygame.draw.rect(self.surface, (abs(value), 0, 0), rect)
+        elif value == -101:
+            pygame.draw.rect(self.surface, (0, 0, 255), rect)
         
 class Position():
     def checkBounds(self, x: int, y: int) -> bool:
@@ -41,17 +37,25 @@ class Position():
 
     def updateBlock(self, x: int, y: int, value: int) -> None:
         if self.checkBounds(x, y) and self.blocks[y][x] != -1:
-            self.blocks[y][x] = value
+            self.blocks[y][x] += value
 
-    def updateParticleCounter(self, value: int) -> None:
-        self.particleCounter += value
+    def setBlock(self, x: int, y: int, value: int) -> None:
+        if self.checkBounds(x, y) and self.blocks[y][x] != -1:
+            self.blocks[y][x] += value
 
 class Moves(Position):
-    def getMoves(self, startX: int, startY: int) -> list[tuple()]:
-        moves = [(startX, startY), (startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
-        for x, y in moves.copy():
-            if not self.checkBounds(x, y):
-                moves.remove((x,y))
+    def getMoves(self, startX: int, startY: int, depth: int=4) -> list[tuple()]:
+        moves = []
+        for x in range(-depth,depth+1):
+            Y = int((depth*depth-x*x)**0.5)
+            for y in range(-Y,Y+1):
+                
+                x1 = x+startX
+                y1 = y+startY
+
+                if self.checkBounds(x1, y1):
+                    moves.append((x1, y1))
+
         return moves
 
     def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
@@ -70,18 +74,15 @@ class Diffusion(Moves):
     def update(self, blocks: list[int]) -> None:
         for y, col in enumerate(blocks):
             for x, block in enumerate(col):
-                pass
-                # if block >= VISCOSITY:
-                #     self.updateBlocks(x, y)
+                if block > 0:
+                    self.updateBlocks(x, y)
 
     def updateBlocks(self, x: int, y: int) -> None:
-        neighboursPos = self.getMoves(x, y)
-        values = self.getBlockValuesFromPosList(neighboursPos)
-        avg = self.getAverageForList(values)
-        for x, y in neighboursPos:
-            if self.getBlockValue(x, y) != -1:
-                self.updateBlock(x, y, avg)
-    
+        pass
+        # neighboursPos = self.getMoves(x, y)
+        # for x, y in neighboursPos:
+        #     self.updateBlock(x, y, -3)
+
 class Controls():
     def createBlocks(self) -> None:
         for y in range(HEIGHTBLOCKS):
@@ -96,16 +97,19 @@ class Controls():
 
     def addAntNest(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
-        self.updateBlock(x, y, -1)
+        self.antCounter += 1
+        self.setBlock(x, y, -101)
 
     def addFood(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
-        self.updateBlock(x, y, -2)
+        self.foodCounter += 1 
+        self.updateBlock(x, y, 1)
 
     def reset(self) -> None:
         self.blocks = []
         self.blockRect = []
-        self.particleCounter = 0
+        self.antCounter = 0
+        self.foodCounter = 0
 
         self.createBlocks()
 
@@ -118,6 +122,7 @@ class Grid(Render, Diffusion, Controls):
         self.blockRect = []
         
         self.antCounter = 0
+        self.foodCounter = 0
         self.createBlocks()
 
     def render(self) -> None:

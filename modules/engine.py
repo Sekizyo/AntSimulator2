@@ -11,6 +11,7 @@ class Render():
         self.grid.render()
         self.updateFps()
         self.updateAntCounter()
+        self.updateFoodCounter()
 
         pygame.display.flip()
 
@@ -22,6 +23,10 @@ class Render():
     def updateAntCounter(self) -> None:
         antText = FONT.render(f"Ants: {str(self.grid.antCounter)}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, antText, (80,0))
+
+    def updateFoodCounter(self) -> None:
+        foodText = FONT.render(f"Food: {str(self.grid.foodCounter)}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, foodText, (150,0))
 
 class Logic():
     def logic(self) -> None:
@@ -43,9 +48,9 @@ class Logic():
     def controlsMouse(self) -> None:
         pass
         if pygame.mouse.get_pressed()[0]:
-            self.grid.addAntNest(pygame.mouse.get_pos())
-        if pygame.mouse.get_pressed()[2]:
             self.grid.addFood(pygame.mouse.get_pos())
+        if pygame.mouse.get_pressed()[2]:
+            self.grid.addAntNest(pygame.mouse.get_pos())
 
 class Tests():
     def testRun(self, test=False) -> None:
