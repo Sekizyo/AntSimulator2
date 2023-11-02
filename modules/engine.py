@@ -46,11 +46,12 @@ class Logic():
             self.grid.reset()
 
     def controlsMouse(self) -> None:
-        pass
         if pygame.mouse.get_pressed()[0]:
             self.grid.addFood(pygame.mouse.get_pos())
-        if pygame.mouse.get_pressed()[2]:
+        elif pygame.mouse.get_pressed()[1]:
             self.grid.addAntNest(pygame.mouse.get_pos())
+        elif pygame.mouse.get_pressed()[2]:
+            self.grid.addAnts(pygame.mouse.get_pos())
 
 class Tests():
     def testRun(self, test=False) -> None:
@@ -70,7 +71,7 @@ class Engine(Render, Logic, Tests):
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 60
+        self.fps = 15
         self.avgFps = self.fps
         self.clock = pygame.time.Clock()
 

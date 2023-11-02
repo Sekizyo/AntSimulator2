@@ -1,6 +1,7 @@
 import pygame
 
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
+from modules.ant import Ant
 
 class Render():
     def renderGrid(self, blockRect: list[pygame.Rect], blocks: list[int]) -> None:
@@ -17,9 +18,9 @@ class Render():
         elif value > 255:
             pygame.draw.rect(self.surface, (0, 255, 0), rect)
         elif 0 > value >= -100:
-            pygame.draw.rect(self.surface, (abs(value), 0, 0), rect)
+            pygame.draw.rect(self.surface, (0, 0, abs(value)), rect)
         elif value == -101:
-            pygame.draw.rect(self.surface, (0, 0, 255), rect)
+            pygame.draw.rect(self.surface, (255, 0, 0), rect)
         
 class Position():
     def checkBounds(self, x: int, y: int) -> bool:
@@ -36,26 +37,19 @@ class Position():
         return self.blocks[y][x]
 
     def updateBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y) and self.blocks[y][x] != -1:
+        if self.checkBounds(x, y):
             self.blocks[y][x] += value
 
     def setBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y) and self.blocks[y][x] != -1:
-            self.blocks[y][x] += value
+        if self.checkBounds(x, y):
+            self.blocks[y][x] = value
 
 class Moves(Position):
-    def getMoves(self, startX: int, startY: int, depth: int=4) -> list[tuple()]:
-        moves = []
-        for x in range(-depth,depth+1):
-            Y = int((depth*depth-x*x)**0.5)
-            for y in range(-Y,Y+1):
-                
-                x1 = x+startX
-                y1 = y+startY
-
-                if self.checkBounds(x1, y1):
-                    moves.append((x1, y1))
-
+    def getMoves(self, startX: int, startY: int) -> list[tuple()]:
+        moves = [(startX, startY), (startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
+        for x, y in moves.copy():
+            if not self.checkBounds(x, y):
+                moves.remove((x,y))
         return moves
 
     def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
@@ -70,8 +64,8 @@ class Moves(Position):
         if list:
             return sum(list) / len(list)    
 
-class TrailExpiration(Moves):
-    def update(self, blocks: list[int]) -> None:
+class TrailExpiration():
+    def updateTrailExpiration(self, blocks: list[int]) -> None:
         for y, col in enumerate(blocks):
             for x, block in enumerate(col):
                 self.expirate(x, y, block)
@@ -83,7 +77,24 @@ class TrailExpiration(Moves):
             self.updateBlock(x, y, 1)
 
 class Trail(TrailExpiration):
-    pass
+    def updateTrail(self, x: int, y: int, trailValue: int):
+        block = self.getBlockValue(x, y)
+        pass
+
+
+    
+class AntManager(Trail, Moves):
+    def createAnt(self, x: int, y: int) -> None:
+        if self.checkBounds(x, y):
+            self.ants.append(Ant(x, y))
+
+    def updateAnts(self):
+        for ant in self.ants:
+            moves = self.getMoves(ant.x, ant.y)
+            values = self.getBlockValuesFromPosList(moves)
+            trailX, trailY, trailValue = ant.decide(moves, values)
+
+            self.updateBlock(trailX, trailY, trailValue)
 
 class Controls():
     def createBlocks(self) -> None:
@@ -97,31 +108,37 @@ class Controls():
             self.blocks.append(tempX)
             self.blockRect.append(tempXRect)
 
-    def addAntNest(self, mouse: tuple()) -> None:
+    def addAnts(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.antCounter += 1
+        self.createAnt(x, y)
+
+    def addAntNest(self, mouse: tuple()) -> None:
+        x, y = self.getGridPosFromPos(mouse)
         self.setBlock(x, y, -101)
 
     def addFood(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
-        self.foodCounter += 10
-        self.updateBlock(x, y, 10)
+        self.foodCounter += 200
+        self.setBlock(x, y, 200)
 
     def reset(self) -> None:
         self.blocks = []
         self.blockRect = []
+        self.ants = []
         self.antCounter = 0
         self.foodCounter = 0
 
         self.createBlocks()
 
-class Grid(Render, Trail, Controls):
+class Grid(Render, AntManager, Controls):
     def __init__(self, surface: pygame.surface.Surface) -> None:
         self.surface = surface
         self.size = BLOCKSIZE
 
         self.blocks = []
         self.blockRect = []
+        self.ants = []
         
         self.antCounter = 0
         self.foodCounter = 0
@@ -131,4 +148,5 @@ class Grid(Render, Trail, Controls):
         self.renderGrid(self.blockRect, self.blocks)
 
     def logic(self) -> None:
-        self.update(self.blocks)
+        self.updateTrailExpiration(self.blocks)
+        self.updateAnts()
