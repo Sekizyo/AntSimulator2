@@ -19,20 +19,25 @@ class Ant():
         self.y = y
 
         if self.searching:
-            self.trainStrenght -= 1
-        else:
             self.trainStrenght += 1
+        else:
+            self.trainStrenght -= 1
 
     def decide(self, moves, values):
         if self.searching:
             best = max(values)
-            if best > 100:
+            if best >= 101:
                 self.switchModes()
         else:
             best = min(values)
-            if best == -101:
+            if best <= -101:
                 self.switchModes()
-
+        
+        print("\n")
+        print(best)
+        print(moves)
+        print(values)
+        print(moves[values.index(best)])
         x, y = moves[values.index(best)]
         self.move(x, y)
 
