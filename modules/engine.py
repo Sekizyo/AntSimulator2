@@ -1,6 +1,6 @@
 
 import pygame
-from modules.__config__ import FONT
+from modules.__config__ import FONT, FPS
 from modules.screen import Screen
 from modules.grid import Grid
 
@@ -73,7 +73,7 @@ class Engine(Render, Logic, Tests):
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 5
+        self.fps = FPS
         self.avgFps = self.fps
         self.clock = pygame.time.Clock()
 
