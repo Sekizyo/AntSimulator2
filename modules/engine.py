@@ -44,6 +44,8 @@ class Logic():
             self.exit = True
         if pygame.key.get_pressed()[pygame.K_r] == True:
             self.grid.reset()
+        if pygame.key.get_pressed()[pygame.K_z] == True:
+            self.grid.addAntNest(pygame.mouse.get_pos())
 
     def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:
@@ -59,7 +61,7 @@ class Tests():
             self.avgFps += self.clock.get_fps() 
             self.testCounter += 1
             
-            if self.testCounter > 100:
+            if self.testCounter > 10000:
                 self.avgFps = self.avgFps//self.testCounter
                 self.kill()
 
@@ -71,7 +73,7 @@ class Engine(Render, Logic, Tests):
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 15
+        self.fps = 5
         self.avgFps = self.fps
         self.clock = pygame.time.Clock()
 
