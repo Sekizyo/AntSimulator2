@@ -1,6 +1,6 @@
 import pygame
 
-from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
+from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, TRAILEXPIRATIONRATE
 from modules.ant import Ant
 
 class Render():
@@ -46,7 +46,7 @@ class Position():
 
 class Moves(Position):
     def getMoves(self, startX: int, startY: int) -> list[tuple()]:
-        moves = [(startX, startY), (startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
+        moves = [(startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
         for x, y in moves.copy():
             if not self.checkBounds(x, y):
                 moves.remove((x,y))
@@ -56,8 +56,7 @@ class Moves(Position):
         values = []
         for x, y in pos:
             val = self.getBlockValue(x, y)
-            if val >= 0:
-                values.append(val)
+            values.append(val)
         return values
     
     def getAverageForList(self, list: list) -> float:
@@ -72,17 +71,18 @@ class TrailExpiration():
 
     def expirate(self, x: int, y: int, value: int) -> None:
         if 0 < value <= 100:
-            self.updateBlock(x, y, -1)
+            self.updateBlock(x, y, -TRAILEXPIRATIONRATE)
         elif 0 > value >= -100:
-            self.updateBlock(x, y, 1)
+            self.updateBlock(x, y, TRAILEXPIRATIONRATE)
 
 class Trail(TrailExpiration):
     def updateTrail(self, x: int, y: int, trailValue: int):
         block = self.getBlockValue(x, y)
-        pass
+        value = block+trailValue
 
+        if 0 < value <= 100 or 0 > value >= -100:
+            self.setBlock(x, y, value)
 
-    
 class AntManager(Trail, Moves):
     def createAnt(self, x: int, y: int) -> None:
         if self.checkBounds(x, y):
@@ -94,7 +94,7 @@ class AntManager(Trail, Moves):
             values = self.getBlockValuesFromPosList(moves)
             trailX, trailY, trailValue = ant.decide(moves, values)
 
-            self.updateBlock(trailX, trailY, trailValue)
+            self.updateTrail(trailX, trailY, trailValue)
 
 class Controls():
     def createBlocks(self) -> None:
