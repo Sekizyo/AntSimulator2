@@ -1,4 +1,4 @@
-from random import choices
+from random import choice, choices
 
 class Ant():
     def __init__(self, x: int, y: int, searching: bool = True) -> None:
@@ -52,24 +52,16 @@ class Ant():
         return moves, values
 
     def decide(self, moves, values):
+        movesCopy = moves.copy()
         moves, values = self.removeTrailType(moves, values, searching=(not self.searching))
         
-        print()
-        print(moves, values)
         if values:
-            x, y =  choices(moves, values)[0]
+            x, y = choices(moves, values)[0]
+            if values[moves.index((x, y))] >= 101:
+                self.switchModes()
+
         else:
-            return self.x, self.y, self.trainStrenght
+            x, y = choice(movesCopy)
         
         self.move(x, y)
-        
-        print(f"(x, y): {x, y}")
-        print(f"Mov: {moves.index((x,y))}")
-        print(f"Val: {values[moves.index((x, y))]}")
-
-        if values[moves.index((x, y))] >= 101:
-            self.switchModes()
-
         return x, y, self.trainStrenght
-
-
