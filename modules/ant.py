@@ -1,36 +1,32 @@
 from random import choice, choices
 
+from modules.__config__ import TRAILEXPIRATIONRATE 
+
 class Ant():
     def __init__(self, x: int, y: int, searching: bool = True) -> None:
         self.x = x
         self.y = y
         self.searching = searching
-        self.trainStrenght = -100
-
-    def swtichModeTo(self, searching):
-        if searching:
-            self.searching = True
-            self.trainStrenght = 100
-        else:
-            self.searching = False
-            self.trainStrenght = -100
+        self.trailStrenght = -100
 
     def switchModes(self):
         if self.searching:
             self.searching = False
-            self.trainStrenght = 100
+            self.trailStrenght = 100
         else:
             self.searching = True
-            self.trainStrenght = -100
+            self.trailStrenght = -100
 
     def move(self, x, y):
         self.x = x
         self.y = y
 
-        # if self.searching:
-        #     self.trainStrenght += 1
-        # else:
-        #     self.trainStrenght -= 1
+        if self.searching:
+            if self.trailStrenght < 0:
+                self.trailStrenght += TRAILEXPIRATIONRATE
+        else:
+            if self.trailStrenght > 0:
+                self.trailStrenght -= TRAILEXPIRATIONRATE
 
     def removeTrailType(self, moves: list[int], values: list[int], searching: bool):
         for i, value in enumerate(values):
@@ -64,4 +60,4 @@ class Ant():
             x, y = choice(movesCopy)
         
         self.move(x, y)
-        return x, y, self.trainStrenght
+        return x, y, self.trailStrenght

@@ -45,6 +45,19 @@ class Position():
             self.blocks[y][x] = value
 
 class Moves(Position):
+    def getMoves2(self, startPosX, startPosY, depth=5):
+        moves = []
+        for x in range(-depth,depth+1):
+            Y = int((depth*depth-x*x)**0.5)
+            for y in range(-Y,Y+1):
+                
+                x1 = x+startPosX
+                y1 = y+startPosY
+
+                if self.checkBounds(x1, y1):
+                    moves.append((x1,y1))
+        return moves
+
     def getMoves(self, startX: int, startY: int) -> list[tuple()]:
         moves = [(startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
         for x, y in moves.copy():
@@ -90,7 +103,7 @@ class AntManager(Trail, Moves):
 
     def updateAnts(self):
         for ant in self.ants:
-            moves = self.getMoves(ant.x, ant.y)
+            moves = self.getMoves2(ant.x, ant.y)
             values = self.getBlockValuesFromPosList(moves)
             trailX, trailY, trailValue = ant.decide(moves, values)
 
