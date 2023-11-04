@@ -12,7 +12,7 @@ def test_logic():
     engine.fps = 10
     engine.grid.addFood((1, 11))
     engine.grid.addAntNest((780, 780))
-    engine.grid.addAnts((300, 300))
+    engine.grid.addAnts((780, 798))
     
     avgFps = engine.run()
 
