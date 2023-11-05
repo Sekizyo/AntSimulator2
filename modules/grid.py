@@ -95,6 +95,9 @@ class Trail(TrailExpiration):
 
         if 0 < value <= 100 or 0 > value >= -100:
             self.setBlock(x, y, value)
+        elif block > 100:
+            self.updateBlock(x, y, -1)
+            self.foodCounter -= 1
 
 class AntManager(Trail, Moves):
     def createAnt(self, x: int, y: int) -> None:
@@ -132,7 +135,7 @@ class Controls():
 
     def addFood(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
-        self.foodCounter += 200
+        self.foodCounter += 100
         self.setBlock(x, y, 200)
 
     def reset(self) -> None:
