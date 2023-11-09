@@ -28,6 +28,12 @@ class Position():
             return True
         else:
             return False
+        
+    def checkValueBounds(self, value: int) -> bool:
+        if -101 < value < 200:
+            return True
+        else:
+            return False
 
     def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
@@ -35,13 +41,13 @@ class Position():
     
     def getBlockValue(self, x: int, y: int) -> int:
         return self.blocks[y][x]
-
+    
     def updateBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y):
+        if self.checkValueBounds and self.checkBounds(x, y):
             self.blocks[y][x] += value
 
     def setBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y):
+        if self.checkValueBounds and self.checkBounds(x, y):
             self.blocks[y][x] = value
 
 class Moves(Position):
