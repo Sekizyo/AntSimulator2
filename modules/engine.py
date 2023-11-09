@@ -61,7 +61,7 @@ class Tests():
             self.avgFps += self.clock.get_fps() 
             self.testCounter += 1
             
-            if self.testCounter > 10000:
+            if self.testCounter > 300:
                 self.avgFps = self.avgFps//self.testCounter
                 self.kill()
 
