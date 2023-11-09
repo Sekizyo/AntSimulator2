@@ -85,8 +85,9 @@ class Moves(Position):
 class TrailExpiration():
     def updateTrailExpiration(self, blocks: list[int]) -> None:
         for y, col in enumerate(blocks):
-            for x, block in enumerate(col):
-                self.expirate(x, y, block)
+            if max(col) != 0:
+                for x, block in enumerate(col):
+                    self.expirate(x, y, block)
 
     def expirate(self, x: int, y: int, value: int) -> None:
         if 0 < value <= 100:
