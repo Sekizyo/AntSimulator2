@@ -110,7 +110,7 @@ class AntManager(Trail, Moves):
         if self.checkBounds(x, y):
             self.ants.append(Ant(x, y))
 
-    def updateAnts(self):
+    def updateAnts(self) -> None:
         for ant in self.ants:
             moves = self.getMoves2(ant.x, ant.y)
             values = self.getBlockValuesFromPosList(moves)
@@ -130,7 +130,7 @@ class Controls():
             self.blocks.append(tempX)
             self.blockRect.append(tempXRect)
 
-    def addAnts(self, mouse: tuple()) -> None:
+    def addAnt(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.antCounter += 1
         self.createAnt(x, y)
