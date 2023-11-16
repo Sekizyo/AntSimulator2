@@ -53,7 +53,7 @@ class Logic():
         elif pygame.mouse.get_pressed()[1]:
             self.grid.addAntNest(pygame.mouse.get_pos())
         elif pygame.mouse.get_pressed()[2]:
-            self.grid.addAnts(pygame.mouse.get_pos())
+            self.grid.addAnt(pygame.mouse.get_pos())
 
 class Tests():
     def testRun(self, test=False) -> None:

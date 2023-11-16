@@ -34,6 +34,11 @@ class Ant():
                 values[i] = 10
             elif value == 0 and searching:
                 values[i] = -10
+            
+            if value == -101 and not searching:
+                self.trailStrenght = -100
+            elif value > 100 and searching:
+                self.trailStrenght = 100
 
         if searching:
             values = [-num for num in values]
@@ -55,7 +60,6 @@ class Ant():
             x, y = choices(moves, values)[0]
             if values[moves.index((x, y))] >= 101:
                 self.switchModes()
-
         else:
             x, y = choice(movesCopy)
         
